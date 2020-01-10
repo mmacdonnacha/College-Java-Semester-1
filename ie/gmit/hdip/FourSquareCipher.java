@@ -32,7 +32,7 @@ public class FourSquareCipher {
         System.out.println("Enter the key with no spaces.");
         System.out.println("The key must be more than 25 characters long and no numbers.");
         System.out.print("> ");
-        String key = scan.nextLine();
+        String key = scan.next();
         
 
         scan.close();
@@ -54,10 +54,6 @@ public class FourSquareCipher {
         System.out.println("Original message: " + message);
         System.out.println("New message: " + output.replace(" ", ""));
 
-        //String output = encodeMessage("Hello Worlds");
-        //System.out.println("Hello Worlds\n" + output);
-        //String decrypted = decodeMessage(output);
-        //System.out.println(decrypted);
     }
 
     public void generateMatrix(String keyword){
@@ -175,7 +171,6 @@ public class FourSquareCipher {
 
     private String encodeMessage(String plaintext){
         String message = checkMessageIsEvenLength(plaintext);
-        //message = replaceQwithX(message);
         String[] bigrams = bigrams(message);
         StringBuilder encrypted = new StringBuilder();
 
@@ -185,7 +180,7 @@ public class FourSquareCipher {
             //First letter
             for(int i=0; i<(SIZE/2); i++){
                 for(int j=0; j<(SIZE/2); j++) {
-                    if (s.charAt(0) == matrix[i][j]){  //s.substring(0, 1).equals(matrix[i][j])){
+                    if (s.charAt(0) == matrix[i][j]){
                         x1 = i;
                         y1 = j;
                         break;
@@ -196,7 +191,7 @@ public class FourSquareCipher {
             //Second letter
             for(int i=(SIZE/2); i<SIZE; i++){
                 for(int j=(SIZE/2); j<SIZE; j++) {
-                    if (s.charAt(1) == matrix[i][j]){//s.substring(1, 2).equals(matrix[i][j])){
+                    if (s.charAt(1) == matrix[i][j]){
                         x2 = i;
                         y2 = j;
                         break;
@@ -211,8 +206,8 @@ public class FourSquareCipher {
         }
 
         //split each bigram into chars
-        //find location of first letter in the top left
-        //find location of second letter in the bottom right
+        //find location of first letter in the top left quadrant of matrix
+        //find location of second letter in the bottom right quadrant of matrix
         //
         //find first encrypted letter by first letter[row] and second letter[col]
         //find second encrypted letter by first letter[col] and second letter[row]
@@ -232,7 +227,7 @@ public class FourSquareCipher {
             //First letter
             for(int i=0; i<(SIZE/2); i++){
                 for(int j=(SIZE/2); j<SIZE; j++) {
-                    if (s.charAt(0) == matrix[i][j]){ //s.substring(0, 1).equals(matrix[i][j])){
+                    if (s.charAt(0) == matrix[i][j]){ 
                         x1 = i;
                         y1 = j;
                         break;
@@ -243,7 +238,7 @@ public class FourSquareCipher {
             //Second letter
             for(int i=(SIZE/2); i<SIZE; i++){
                 for(int j=0; j<(SIZE/2); j++) {
-                    if (s.charAt(1) == matrix[i][j]){   //s.substring(1, 2).  (matrix[i][j])){
+                    if (s.charAt(1) == matrix[i][j]){ 
                         x2 = i;
                         y2 = j;
                         break;
