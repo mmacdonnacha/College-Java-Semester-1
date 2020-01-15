@@ -1,95 +1,89 @@
 package ie.gmit.hdip;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Random;
 import java.util.Scanner;
 
 public class FourSquareCipher {
 
-    final private String ALPHABET = "ABCDEFGHIJKLMNOPRSTUVWXYZ"; // minus q
+    final private String ALPHABET = "ABCDEFGHIKLMNOPQRSTUVWXYZ"; // minus j
     final int SIZE = 10;
     private char[][] matrix = new char[SIZE][SIZE];
-
-    public FourSquareCipher(){
-
-    }
 
     public void mainMenu(){
 
         Scanner scan = new Scanner(System.in);
 
+        
         System.out.println("************************************");
         System.out.println("*        Four Square Cipher        *");
         System.out.println("************************************");
 
-        System.out.println("Enter the message you want to encrypt/decrypt(no special characters)");
+        System.out.println("Enter a keyword with a length >= 50 characters");
+        System.out.println("or two keywords with a length >= 25 characters");
+        System.out.println("containing unique characters separated by a space.");
+        System.out.println("Leave blank to autogenerate a keyword");
+        System.out.print(">");
+        String keyword = scan.nextLine();
+        if(keyword.isEmpty()){
+            keyword = autoGenerateKeyword();
+        }else {
+            keyword.replace(" ", "");
+        }
+        System.out.println("Keyword: " + keyword);
+
+        System.out.println("Enter the name of the file you want encrypt/decrypt)");
         System.out.print("> ");
-        String message = scan.nextLine();
+        String fileName = scan.nextLine();
 
         System.out.println("Enter 1 to encrypt.");
         System.out.println("Enter 2 to decrypt.");
         System.out.print("> ");
         int mode = scan.nextInt();
 
-        System.out.println("Enter the key with no spaces.");
-        System.out.println("The key must be more than 25 characters long and no numbers.");
-        System.out.print("> ");
-        String key = scan.next();
-        
-
         scan.close();
 
-        generateMatrix(key);
-        //printMatrix(); for debugging
+        generateMatrix(keyword);
+        //printMatrix(); //for debugging
 
         String output = "";
-        if(mode == 1){
-            output = encodeMessage(message);
-        }
-        else if (mode == 2){
-            output = decodeMessage(message);
-        }
-        else{
+        if(mode == 1 || mode == 2){
+            output = readFromFile(fileName, mode);
+            writeToFile(output, fileName);
+        } else{
             System.out.println("Error with mode selection.");
         }
 
-        System.out.println("Original message: " + message);
+        System.out.println("Original message: " + fileName);
         System.out.println("New message: " + output.replace(" ", ""));
 
     }
 
     public void generateMatrix(String keyword){
-        String key = stripDuplicateLetters(keyword);
-        key = checkMessageIsEvenLength(key);
-        String keywordA = key.substring(0, key.length()/2);
-        String keywordB = key.substring(key.length()/2);
+        String keywordA = keyword.substring(0, keyword.length()/2);
+        String keywordB = keyword.substring(keyword.length()/2);
 
-        
-        
-        generateTopLeft();
-        generateTopRight(keywordA);
-        generateBottomLeft(keywordB);
-        generateBottomRight();
+        generateTopLeft(); //plaintext
+        generateTopRight(keywordA); //ciphertext
+        generateBottomLeft(keywordB); //ciphertext
+        generateBottomRight(); //plaintext
+
+        // printMatrix();
     }
 
-    private String checkMessageIsEvenLength(String word){
+    private String checkIfEvenLength(String word){
         word = word.replace(" ", "").replace("'", "");
         if(word.length()%2 == 1){
             return word.toUpperCase() + "X";
         }
 
         return word.toUpperCase();
-    }
-
-    private String stripDuplicateLetters(String word){
-        word = word.replace(" ", "");
-        StringBuilder sb = new StringBuilder();
-        char[] letters = word.toCharArray();
-
-        for (char c : letters){
-            if(!sb.toString().contains(Character.toString(c))){
-                sb.append(c);
-            }
-        }
-        return sb.toString();
     }
 
     private void generateTopLeft(){
@@ -158,7 +152,7 @@ public class FourSquareCipher {
     }
 
     private String[] bigrams(String plaintext){
-        plaintext = checkMessageIsEvenLength(plaintext);
+        plaintext = checkIfEvenLength(plaintext);
         String[] bigramsArray = new String[plaintext.length() / 2];
         int index = 0;
 
@@ -169,8 +163,8 @@ public class FourSquareCipher {
         return bigramsArray;
     }
 
-    private String encodeMessage(String plaintext){
-        String message = checkMessageIsEvenLength(plaintext);
+    public String encodeMessage(String plaintext){
+        String message = checkIfEvenLength(plaintext);
         String[] bigrams = bigrams(message);
         StringBuilder encrypted = new StringBuilder();
 
@@ -212,12 +206,11 @@ public class FourSquareCipher {
         //find first encrypted letter by first letter[row] and second letter[col]
         //find second encrypted letter by first letter[col] and second letter[row]
         //top right + bottom left
-        return encrypted.toString();
+        return encrypted.toString().replace(" ", "");
     }
 
-    private String decodeMessage(String encrypted){
-        String message = checkMessageIsEvenLength(encrypted);
-        //message = replaceQwithX(message);
+    public String decodeMessage(String encrypted){
+        String message = checkIfEvenLength(encrypted);
         String[] bigrams = bigrams(message);
         StringBuilder decrypted = new StringBuilder();
 
@@ -254,7 +247,7 @@ public class FourSquareCipher {
         /*
         decrypt message
          */
-        return decrypted.toString();
+        return decrypted.toString().replace(" ", "");
     }
 
     public void printMatrix(){
@@ -281,5 +274,69 @@ public class FourSquareCipher {
             sb = new StringBuilder();
         }
 
+    }
+
+    private String autoGenerateKeyword(){
+        Random rand = new Random();
+        rand.setSeed(rand.nextInt(1000000));
+        StringBuilder keyword = new StringBuilder();
+    
+        while (keyword.length() < 25){
+            int x = rand.nextInt(25);
+            char c = ALPHABET.charAt(x);
+            if(!keyword.toString().contains("" + c)){
+                keyword.append(c);
+            }
+        }
+        return keyword.toString();
+    }
+
+    private String readFromFile(String fileName, int mode){
+        File file = new File(fileName);
+        StringBuilder sb = new StringBuilder();
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+
+            String line;
+            if (mode == 1) { //encryption
+                while ((line = br.readLine()) != null) {
+
+                    String encrypted = encodeMessage(line);
+                    sb.append(encrypted + "\n");
+                }
+            }else {
+                while ((line = br.readLine()) != null) {
+
+                    String decrypted = decodeMessage(line);
+                    sb.append(decrypted + "\n");
+                }
+            }
+
+            br.close();
+            isr.close();
+            fis.close();
+
+        }catch(IOException ioe){
+            System.out.println("Cannot find file: " + fileName);            
+        }
+
+        return sb.toString();
+    }
+
+    private void writeToFile(String encryptedText, String fileName){
+        String outputFile = "AFTER=" + fileName;
+        try{
+            FileWriter fw = new FileWriter(outputFile);
+            BufferedWriter writer = new BufferedWriter(fw);
+
+            writer.write(encryptedText);
+            
+            writer.close();
+            fw.close();
+        } catch(IOException ioe) {
+            System.out.println("Error with writing to file: " + outputFile);
+        }
     }
 }
