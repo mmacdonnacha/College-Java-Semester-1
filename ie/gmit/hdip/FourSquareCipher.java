@@ -65,7 +65,7 @@ public class FourSquareCipher {
 
     }
 
-    public void generateMatrix(String keyword){
+    private void generateMatrix(String keyword){
         String keywordA = keyword.substring(0, keyword.length()/2);
         String keywordB = keyword.substring(keyword.length()/2);
 
@@ -163,7 +163,7 @@ public class FourSquareCipher {
         return bigramsArray;
     }
 
-    public String encodeMessage(String plaintext){
+    private String encodeMessage(String plaintext){
         String message = checkIfEvenLength(plaintext);
         String[] bigrams = bigrams(message);
         StringBuilder encrypted = new StringBuilder();
@@ -199,17 +199,10 @@ public class FourSquareCipher {
             x1=0; y1=0; x2=0; y2=0;
         }
 
-        //split each bigram into chars
-        //find location of first letter in the top left quadrant of matrix
-        //find location of second letter in the bottom right quadrant of matrix
-        //
-        //find first encrypted letter by first letter[row] and second letter[col]
-        //find second encrypted letter by first letter[col] and second letter[row]
-        //top right + bottom left
         return encrypted.toString().replace(" ", "");
     }
 
-    public String decodeMessage(String encrypted){
+    private String decodeMessage(String encrypted){
         String message = checkIfEvenLength(encrypted);
         String[] bigrams = bigrams(message);
         StringBuilder decrypted = new StringBuilder();
@@ -250,7 +243,7 @@ public class FourSquareCipher {
         return decrypted.toString().replace(" ", "");
     }
 
-    public void printMatrix(){
+    private void printMatrix(){
 
         StringBuilder sb = new StringBuilder();
 
@@ -281,8 +274,8 @@ public class FourSquareCipher {
         rand.setSeed(rand.nextInt(1000000));
         StringBuilder keyword = new StringBuilder();
     
-        while (keyword.length() < 25){
-            int x = rand.nextInt(25);
+        while (keyword.length() < ALPHABET.length()){
+            int x = rand.nextInt(ALPHABET.length());
             char c = ALPHABET.charAt(x);
             if(!keyword.toString().contains("" + c)){
                 keyword.append(c);
