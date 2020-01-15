@@ -65,7 +65,7 @@ public class FourSquareCipherExtended {
 
     }
 
-    public void generateMatrix(String keyword){
+    private void generateMatrix(String keyword){
         String keywordA = keyword.substring(0, keyword.length()/2);
         String keywordB = keyword.substring(keyword.length()/2);
 
@@ -162,7 +162,7 @@ public class FourSquareCipherExtended {
         return bigramsArray;
     }
 
-    public String encodeMessage(String plaintext){
+    private String encodeMessage(String plaintext){
         String message = checkIfEvenLength(plaintext);
         String[] bigrams = bigrams(message);
         StringBuilder encrypted = new StringBuilder();
@@ -201,7 +201,7 @@ public class FourSquareCipherExtended {
         return encrypted.toString().replace(" ", "");
     }
 
-    public String decodeMessage(String encrypted){
+    private String decodeMessage(String encrypted){
         String message = checkIfEvenLength(encrypted);
         String[] bigrams = bigrams(message);
         StringBuilder decrypted = new StringBuilder();
@@ -242,7 +242,7 @@ public class FourSquareCipherExtended {
         return decrypted.toString().replace(" ", "");
     }
 
-    public void printMatrix(){
+    private void printMatrix(){
 
         StringBuilder sb = new StringBuilder();
 
